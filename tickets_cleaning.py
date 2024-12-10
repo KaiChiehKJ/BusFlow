@@ -199,3 +199,50 @@ def getMagnification(
 
     return tickets_magnification
 
+def tickets_match_shift(tickets, shifts, routename_col = "ROUTE_NAME" ,getontime_col='GETON_DATE', direction_col='DIRECTION'):
+    """
+    將刷卡資料匹配到最接近的班次。
+
+    參數:
+        tickets (DataFrame): 包含刷卡資料的 DataFrame。
+        shifts (DataFrame): 包含班次資料的 DataFrame。
+        getontime_col (str): 表示刷卡時間的欄位名稱，默認為 'GETON_DATE'。
+        direction_col (str): 表示方向的欄位名稱，默認為 'DIRECTION'。
+
+    返回:
+        DataFrame: 加入 "Matched_Shift" 欄位的刷卡資料 DataFrame。
+    """
+    import pandas as pd
+    # 轉換時間欄位格式
+    tickets[getontime_col] = pd.to_datetime(tickets[getontime_col])
+    shifts["Shift"] = pd.to_datetime(shifts["Shift"], format="%H:%M:%S").dt.time
+
+    # 定義函數來匹配班次
+    def match_shift(row, available_shifts):
+        geton_time = row[getontime_col].time()
+        available_shifts = sorted(available_shifts)
+        for i in range(len(available_shifts)):
+            if geton_time < available_shifts[i]:  # 比最早的 Shift 早
+                return available_shifts[max(0, i - 1)]  # 返回上一個班次（或第一個班次）
+        return available_shifts[-1]  # 晚於所有班次，返回最後一個班次
+
+    # 匹配班次的主要邏輯
+    matched_shifts = []
+    for _, ticket in tickets.iterrows():
+        # 找到對應的班次
+        route_shifts = shifts[
+            (shifts["RouteName"] == ticket[routename_col]) &
+            (shifts["IsWorkday"] == ticket["IsWorkday"]) &
+            (shifts["Direction"] == ticket[direction_col])
+        ]["Shift"].tolist()
+
+        # 如果有班次，匹配
+        if route_shifts:
+            matched_shift = match_shift(ticket, route_shifts)
+            matched_shifts.append(matched_shift)
+        else:
+            matched_shifts.append(None)  # 如果沒有匹配的班次
+
+    # 新增匹配結果欄位
+    tickets["Matched_Shift"] = matched_shifts
+    return tickets
