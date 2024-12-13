@@ -41,3 +41,51 @@ def snap_points_to_line(stops_gdf, routes_gdf,
     stops_gdf[seq_lat_col] = stops_gdf.geometry.y
     stops_gdf[seq_lng_col] = stops_gdf.geometry.x
     return stops_gdf
+
+def split_routes(busroute_select, seq_select,
+                 route_routename_col='RouteName',
+                 route_direction_col='Direction',
+                 seq_routename_col='RouteName',
+                 seq_direction_col='Direction',
+                 seq_seq_col='Seq',
+                 seq_lat_col='Lat',
+                 seq_lng_col='Lon'):
+    import pandas as pd
+    import geopandas as gpd
+    from shapely.geometry import LineString, Point
+    from shapely.ops import substring
+
+    output = []
+
+    for _, route in busroute_select.iterrows():
+        route_name = route[route_routename_col]
+        direction = route[route_direction_col]
+        geometry = route['geometry']
+
+        # 過濾對應路線與方向的站點
+        stops = seq_select[(seq_select[seq_routename_col] == route_name) & 
+                           (seq_select[seq_direction_col] == direction)].sort_values(seq_seq_col)
+
+        # 確保站點順序對應於路線
+        stop_coords = [(row[seq_lng_col], row[seq_lat_col]) for _, row in stops.iterrows()]
+
+        for i in range(len(stop_coords) - 1):
+            start_point = Point(stop_coords[i])
+            end_point = Point(stop_coords[i + 1])
+
+            # 找到站點在路線中的比例位置
+            start_distance = geometry.project(start_point)
+            end_distance = geometry.project(end_point)
+
+            # 提取路線幾何分段
+            segment = substring(geometry, start_distance, end_distance)
+
+            output.append({
+                'RouteName': route_name,
+                'Direction': direction,
+                'StartSeq': stops.iloc[i][seq_seq_col],
+                'EndSeq': stops.iloc[i + 1][seq_seq_col],
+                'geometry': segment
+            })
+
+    return gpd.GeoDataFrame(output)
