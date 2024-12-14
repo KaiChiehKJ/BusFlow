@@ -348,3 +348,35 @@ def operation_calcuate(df, dayscountdf, datayearmonth_col='DataYearMonth',
     df['PassengersPerKilometers'] = df[passengers_col] / df[drivingmiles_col]  # 每公里載客
     df['IncomePerKilometers'] = df[income_col] / df[passengerkilometers_col] # 每公里營收
     return df
+
+# 定義處理整個 DataFrame 的函數
+def add_weekday_counts(dataframe):
+    import calendar
+    import pandas as pd
+    # 將 DataYearMonth 轉換為 datetime 格式
+    dataframe["DataYearMonth"] = pd.to_datetime(dataframe["DataYearMonth"], format="%Y%m")
+    
+    # 定義計算每個星期幾天數的函數
+    def calculate_weekday_counts(date):
+        year = date.year
+        month = date.month
+        weekday_counts = {i: 0 for i in range(7)}  # 初始化星期一到星期日的天數為 0
+
+        # 取得該月份的第一天和天數
+        _, num_days = calendar.monthrange(year, month)
+
+        # 計算每一天的星期幾
+        for day in range(1, num_days + 1):
+            weekday = calendar.weekday(year, month, day)
+            weekday_counts[weekday] += 1
+
+        return [weekday_counts[i] for i in range(7)]  # 回傳 [Monday, Tuesday, ..., Sunday] 的次數
+
+    # 計算每個月份的星期天數並新增到 DataFrame
+    dataframe[["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]] = dataframe["DataYearMonth"].apply(
+        calculate_weekday_counts
+    ).apply(pd.Series)
+    # 將 DataYearMonth 格式化為指定格式 (%Y%m)
+    dataframe["DataYearMonth"] = dataframe["DataYearMonth"].dt.strftime("%Y%m")
+    
+    return dataframe
