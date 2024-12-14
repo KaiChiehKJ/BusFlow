@@ -304,16 +304,17 @@ def define_quadrant(df, groupbycolumns, xcol, ycol, measure='mean'):
     return df
 
 
-def operation_calcuate(df, datayearmonth_col='DataYearMonth',
+def operation_calcuate(df, dayscountdf, datayearmonth_col='DataYearMonth',
                         operator_col='Operator', routename_col='RouteName', 
                         drivingmiles_col='DrivingMiles', shift_col='Shifts',
                         passengers_col='Passengers', passengerkilometers_col='PassengerKilometers',
-                        income_col='Income', dayscountdf = dayscount):
+                        income_col='Income' ): 
     """
     修正錯誤並優化函式的資料處理邏輯。
 
     Parameters:
     - df: pandas.DataFrame
+    - dayscountdf: pandas.DataFrame 為之前算出來的天數 
     - datayearmonth_col: str, 預設為 'DataYearMonth'
     - operator_col: str, 預設為 'Operator'
     - routename_col: str, 預設為 'RouteName'
@@ -322,7 +323,6 @@ def operation_calcuate(df, datayearmonth_col='DataYearMonth',
     - passengers_col: str, 預設為 'Passengers'
     - passengerkilometers_col: str, 預設為 'PassengerKilometers'
     - income_col: str, 預設為 'Income'
-    - dayscount: pandas.DataFrame 為之前算出來的天數 
 
     Returns:
     - pandas.DataFrame, 修正後的資料框
