@@ -246,3 +246,105 @@ def tickets_match_shift(tickets, shifts, routename_col = "ROUTE_NAME" ,getontime
     # 新增匹配結果欄位
     tickets["Matched_Shift"] = matched_shifts
     return tickets
+
+def define_quadrant(df, groupbycolumns, xcol, ycol, measure='mean'):
+    """
+    定義四象限，根據 xcol 和 ycol 的值進行比較來找出重點。
+
+    Parameters:
+        df (pd.DataFrame): 原始資料框。
+        groupbycolumns (list): 需要進行分組的欄位。
+        xcol (str): x象限上的欄位。
+        ycol (str): y象限上的欄位。
+        measure (str): 'mean'、'median' 或 'mode'，用來計算 x 和 y 軸的值，預設為 'mean'。
+
+    Returns:
+        pd.DataFrame: 加入象限分類的資料框。
+    """
+    import pandas as pd 
+    # 確保傳入的 measure 是有效的
+    if measure not in ['mean', 'median', 'mode']:
+        raise ValueError("Invalid measure. Choose from 'mean', 'median', or 'mode'.")
+
+    # 複製原始資料框
+    df_how = df.copy()
+
+    # 定義 measure 映射
+    measure_map = {
+        'mean': lambda x: x.mean(),
+        'median': lambda x: x.median(),
+        'mode': lambda x: x.mode().iloc[0] if not x.mode().empty else None
+    }
+
+    # 使用 groupby 和 agg 來計算對應的統計數值
+    df_how = df.groupby(groupbycolumns).agg({
+        xcol: measure_map[measure],
+        ycol: measure_map[measure]
+    }).rename(columns={xcol: 'x', ycol: 'y'}).reset_index()
+
+    # 合併原始數據框和計算過的數據框
+    df = pd.merge(df, df_how, on=groupbycolumns, how='left')
+
+    # 根據 xcol 和 ycol 的值與 x 和 y 比較，為資料點分配四象限
+    def assign_quadrant(row):
+        if row[xcol] > row['x'] and row[ycol] > row['y']:
+            return 'Q1'  # 第一象限
+        elif row[xcol] < row['x'] and row[ycol] > row['y']:
+            return 'Q2'  # 第二象限
+        elif row[xcol] < row['x'] and row[ycol] < row['y']:
+            return 'Q3'  # 第三象限
+        elif row[xcol] > row['x'] and row[ycol] < row['y']:
+            return 'Q4'  # 第四象限
+        else:
+            return 'On the Border'  # 如果正好在邊界上，歸類為邊界區域
+
+    # 為資料框中的每一列分配象限
+    df['quadrant'] = df.apply(assign_quadrant, axis=1)
+
+    return df
+
+
+def operation_calcuate(df, datayearmonth_col='DataYearMonth',
+                        operator_col='Operator', routename_col='RouteName', 
+                        drivingmiles_col='DrivingMiles', shift_col='Shifts',
+                        passengers_col='Passengers', passengerkilometers_col='PassengerKilometers',
+                        income_col='Income', dayscountdf = dayscount):
+    """
+    修正錯誤並優化函式的資料處理邏輯。
+
+    Parameters:
+    - df: pandas.DataFrame
+    - datayearmonth_col: str, 預設為 'DataYearMonth'
+    - operator_col: str, 預設為 'Operator'
+    - routename_col: str, 預設為 'RouteName'
+    - drivingmiles_col: str, 預設為 'DrivingMiles'
+    - shift_col: str, 預設為 'Shifts'
+    - passengers_col: str, 預設為 'Passengers'
+    - passengerkilometers_col: str, 預設為 'PassengerKilometers'
+    - income_col: str, 預設為 'Income'
+    - dayscount: pandas.DataFrame 為之前算出來的天數 
+
+    Returns:
+    - pandas.DataFrame, 修正後的資料框
+    """
+    import pandas as pd
+    # 填補 NaN
+    df = df.fillna(0)
+    
+    # 移除重複值
+    df = df.drop_duplicates()
+
+    # 將資料轉型
+    df[[operator_col, routename_col]] = df[[operator_col, routename_col]].astype(str)
+    df[[drivingmiles_col, shift_col, passengers_col, passengerkilometers_col, income_col]] = df[[drivingmiles_col, shift_col, passengers_col, passengerkilometers_col, income_col]].astype(float)
+
+    # 營運指標計算
+    dayscountdf['Days'] = dayscountdf['Holiday'] + dayscountdf['Workday']
+    df = pd.merge(df, dayscountdf[['DataYearMonth','Days']], left_on=datayearmonth_col, right_on='DataYearMonth')
+    df['DailyShifts'] = df[shift_col] / df['Days'] #  每日平均班次
+    df['PassengersPerShift'] = df[passengers_col] / df[shift_col] # 每班次平均載客數
+    df['PassengersPerDay'] = df[passengers_col] / df['Days'] # 每日平均載客
+    df['KilometersPerPassengers'] = df[passengerkilometers_col] / df[passengers_col] # 每人平均搭乘里程
+    df['PassengersPerKilometers'] = df[passengers_col] / df[drivingmiles_col]  # 每公里載客
+    df['IncomePerKilometers'] = df[income_col] / df[passengerkilometers_col] # 每公里營收
+    return df
