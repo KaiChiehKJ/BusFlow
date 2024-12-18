@@ -13,19 +13,19 @@
 ## 安裝步驟
 因本專案的資料涉及個資無法提供，但欲使用相關的路線資料，可以至TDX官網進行下載路線資料，以及函文請示相關資料。
 需要確保目錄架構為：
-project_name/
-├── code/
-│   ├── prepare.ipynb      # 公車動態網站班表爬蟲
-│   ├── busroute.ipynb     # 公車路線切分與轉換
-│   └── main.ipynb         # 營運資料、票證資料的比對與計算
-│   ├── busroute.py        # 公車路線切分與站點比對
-│   ├── tickets_cleaning.py # 資料清洗、票證放大率、營運績效指標計算
-├── input/
-│   ├── tickets.csv        # 原始票證資料
-│   ├── operation.csv      # 原始營運資料
-│   └── seq.csv            # 公車站序資料
-├── requirements.txt       # 用於安裝依賴包的列表
-└── README.md              # 項目的說明文件
+project_name/ <br>
+├── code/ <br>
+│   ├── prepare.ipynb      # 公車動態網站班表爬蟲 <br>
+│   ├── busroute.ipynb     # 公車路線切分與轉換 <br>
+│   └── main.ipynb         # 營運資料、票證資料的比對與計算 <br>
+│   ├── busroute.py        # 公車路線切分與站點比對 <br>
+│   ├── tickets_cleaning.py # 資料清洗、票證放大率、營運績效指標計算 <br>
+├── input/ <br>
+│   ├── tickets.csv        # 原始票證資料 <br>
+│   ├── operation.csv      # 原始營運資料 <br>
+│   └── seq.csv            # 公車站序資料 <br>
+├── requirements.txt       # 用於安裝依賴包的列表 <br>
+└── README.md              # 項目的說明文件 <br>
 
 
 ## Tableau 儀表板展示
