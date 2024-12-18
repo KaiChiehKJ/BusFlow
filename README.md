@@ -73,9 +73,35 @@ project_name/ <br>
 3. 如果部分路線的站間量都在1人以下，可以建議裁撤該段路線。
 ![image](https://github.com/user-attachments/assets/e44eaa99-43cc-4cca-886c-2d92d7b095e4)
 
+## 貢獻者指引
+* email:timothychang.kj@gmail.com
+* https://linkedin.com/in/timothychang.kj
 
-# 使用範例
-# 貢獻者指引
-# 授權信息
+## 授權信息
+MIT License
+
+Copyright (c) 2024 TimothyChang
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+NOTE: Data related to this project is not included and is not provided for public use. Please refer to the respective data sources for more information.
+
+
 
 
