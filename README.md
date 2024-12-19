@@ -75,7 +75,7 @@ project_name/ <br>
 
 ## 貢獻者指引
 * email:timothychang.kj@gmail.com
-* https://linkedin.com/in/timothychang.kj
+* [https://linkedin.com/in/timothychang.kj](https://www.linkedin.com/in/timothy-chang-kj/)
 
 ## 授權信息
 MIT License
