@@ -1,3 +1,8 @@
+import geopandas as gpd
+import pandas as pd
+from shapely.geometry import LineString, Point
+from shapely.ops import substring
+
 def snap_points_to_line(stops_gdf, routes_gdf, 
                         route_routename_col, route_direction_col, 
                         seq_routename_col, seq_direction_col, 
@@ -16,8 +21,6 @@ def snap_points_to_line(stops_gdf, routes_gdf,
     Returns:
         GeoDataFrame: 更新後的公車站點 GeoDataFrame，其中 geometry 已投影到路線。
     """
-    import geopandas as gpd
-    from shapely.geometry import Point
     snapped_points = []
 
     for _, stop in stops_gdf.iterrows():
@@ -50,10 +53,19 @@ def split_routes(busroute_select, seq_select,
                  seq_seq_col='Seq',
                  seq_lat_col='Lat',
                  seq_lng_col='Lon'):
-    import pandas as pd
-    import geopandas as gpd
-    from shapely.geometry import LineString, Point
-    from shapely.ops import substring
+    """
+    將公車路線 (busroute_select) 依據提供的站序 (seq_select) 上，分為數段的shp。
+    Parameters:
+        busroute_select (GeoDataFrame): 包含公車路線名稱的 GeoDataFrame。
+        seq_select (DataFrame): 包含公車路線站序的 DataFrame。
+        seq_routename_col (str): 路線名稱欄位名稱。
+        seq_direction_col (str): 路線方向欄位名稱。
+        seq_seq_col (str): 站點方向欄位名稱。
+        seq_lat_col (str): 站點緯度欄位名稱。
+        seq_lng_col (str): 站點經度欄位名稱。
+    Returns:
+        GeoDataFrame: 更新後的公車站點 GeoDataFrame，其中 geometry 已投影到路線。
+    """
 
     output = []
 
